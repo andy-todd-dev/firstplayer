@@ -1,10 +1,19 @@
-import "./App.css";
 import { useEffect, useState } from "react";
 import { Stage, Layer, Circle } from "react-konva";
 import randomColor from "randomcolor";
 
+const WINNER_SELECTION_DELAY_MILLISECONDS = 1000;
+const LOSER_COLOR = "darkslategrey";
+
+const getCircleColor = (touch) =>
+  randomColor({
+    luminosity: "light",
+    seed: Math.pow(touch.identifier, 5).toString(),
+    format: "hex",
+  });
+
 const App = () => {
-  const [timer, setTimer] = useState();
+  const [timerData, setTimerData] = useState();
   const [winner, setWinner] = useState();
   const [touches, setTouches] = useState([]);
   const currentTouchIds = touches.map((touch) => touch.identifier).sort();
@@ -13,17 +22,19 @@ const App = () => {
   useEffect(() => {
     console.log("Current touches: ", currentTouchIds);
 
-    timer && clearTimeout(timer);
+    timerData && clearTimeout(timerData.timeoutId) && setTimerData();
     winner && !currentTouchIds.includes(winner) && setWinner();
 
     if (currentTouchIds.length > 1) {
-      setTimer(
-        setTimeout(() => {
-          setWinner(
-            currentTouchIds[Math.floor(Math.random() * currentTouchIds.length)]
-          );
-        }, 1000)
-      );
+      const timeoutId = setTimeout(() => {
+        setWinner(
+          currentTouchIds[Math.floor(Math.random() * currentTouchIds.length)]
+        );
+      }, WINNER_SELECTION_DELAY_MILLISECONDS);
+      setTimerData({
+        timeoutId,
+        timestamp: Date.now(),
+      });
     }
   }, [currentTouchIdsString]);
 
@@ -35,15 +46,7 @@ const App = () => {
         x={touch.clientX}
         y={touch.clientY}
         radius={60}
-        fill={
-          useColor
-            ? randomColor({
-                luminosity: "light",
-                seed: Math.pow(touch.identifier, 5).toString(),
-                format: "hex",
-              })
-            : "darkgrey"
-        }
+        fill={useColor ? getCircleColor(touch) : LOSER_COLOR}
       />
     );
   });
