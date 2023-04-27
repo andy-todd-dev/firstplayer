@@ -1,0 +1,22 @@
+Resources:
+  OIDC:
+    Type: AndyToddDev::OIDC::Github::MODULE
+    Properties:
+      GitHubOrg: andy-todd-dev
+      RepositoryName: firstplayer
+  CloudBuilderPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:*
+              - s3:*
+              - route53:*
+              - cloudfront:*
+              - acm:*
+            Resource: "*"
+      Roles:
+        - !Ref OIDC.Role
