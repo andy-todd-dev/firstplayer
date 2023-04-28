@@ -4,6 +4,7 @@ Resources:
     Properties:
       GitHubOrg: andy-todd-dev
       RepositoryName: firstplayer
+      OIDCProviderArn: "arn:aws:iam::916865351479:oidc-provider/token.actions.githubusercontent.com"
   CloudBuilderPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
