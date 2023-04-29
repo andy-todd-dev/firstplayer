@@ -40,6 +40,6 @@ jobs:
         uses: badsyntax/github-action-aws-cloudformation@v1.0.2
         with:
           stack-name: Firstplayer-production
-          template: infrastructure/cloudformations/firstplayer.yaml
+          template: infrastructure/cloudformation/firstplayer.yaml
           aws-region: us-east-1
           apply-change-set: true
