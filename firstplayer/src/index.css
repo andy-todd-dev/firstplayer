@@ -28,3 +28,14 @@ canvas {
   user-select: none;
   -webkit-user-select: none;
 }
+
+footer {
+  position: fixed;
+  bottom: 0;
+}
+
+footer p {
+  color: gray;
+  font-size: small;
+  margin: 0 0 min(5px, 4vh) min(5px, 4vw);
+}

@@ -1,0 +1,80 @@
+name: Production Release
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Use Node.js 16.x
+        uses: actions/checkout@v3
+        with:
+          node-version: 16.x
+      - name: Install dependencies
+        working-directory: ./firstplayer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm install
+      # - name: Test
+      #   working-directory: ./firstplayer
+      #   run: npm test
+      #   env:
+      #     CI: true
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate build
+        working-directory: ./firstplayer
+        run: npm run build
+        env:
+          VITE_VERSION_BUILD: ${{ github.event.release.tag_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Share artifact inside workflow
+      - name: Share artifact inside workflow
+        uses: actions/upload-artifact@v1
+        with:
+          name: firstplayer-build-${{ github.sha }}
+          path: ./firstplayer/dist
+  deploy:
+    if: github.repository == 'andy-todd-dev/wellness_timer'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::916865351479:role/wellness-builder-user-Role-192IBMAAE1IH8
+          aws-region: us-east-1
+      - uses: actions/download-artifact@v3
+        with:
+          name: wellness-build-${{ github.sha }}
+          path: ./build
+      - uses: badsyntax/github-action-aws-s3@v0.0.1
+        name: Sync App files to S3
+        with:
+          bucket: wellness-ui
+          awsRegion: us-east-1
+          action: sync
+          srcDir: ./build
+          filesGlob: "**/*"
+          cacheControl: "no-cache"
+  performance:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: wellness-build-${{ github.sha }}
+          path: ./firstplayer/build
+      - name: Run Lighthouse against build
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          configPath: ./firstplayer/lighthouserc
+          uploadArtifacts: true
+          temporaryPublicStorage: true

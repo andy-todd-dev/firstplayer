@@ -22,6 +22,10 @@
     }
   },
 
+  "containerEnv": {
+    "VITE_BUILD_VERSION": "development"
+  },
+
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
 

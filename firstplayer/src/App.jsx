@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Stage, Layer, Circle } from "react-konva";
+
 import randomColor from "randomcolor";
 
 const WINNER_SELECTION_DELAY_MILLISECONDS = 1000;
@@ -73,6 +74,10 @@ const App = () => {
       <Stage width={window.innerWidth} height={window.innerHeight}>
         <Layer>{circles}</Layer>
       </Stage>
+    <footer>
+
+      <p>Ver: { import.meta.env.VITE_BUILD_VERSION }</p>
+    </footer>
     </div>
   );
 };

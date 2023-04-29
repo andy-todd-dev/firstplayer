@@ -1,3 +1,22 @@
 {
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "actionButtons": {
+    "commands": [
+      {
+        "name": "Dev",
+        "color": "#af565c",
+        "command": "cd firstplayer && npm run dev"
+      },
+      {
+        "name": "Build",
+        "color": "#af565c",
+        "command": "cd firstplayer && npm run build"
+      },
+      {
+        "name": "Test",
+        "color": "#af565c",
+        "command": "cd firstplayer && npm run test"
+      }
+    ]
+  }
 }
