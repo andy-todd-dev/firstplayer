@@ -34,8 +34,13 @@ footer {
   bottom: 0;
 }
 
-footer p {
+footer ul {
+  display: flex;
+}
+
+footer li {
   color: gray;
   font-size: small;
-  margin: 0 0 min(5px, 4vh) min(5px, 4vw);
+  list-style: none;
+  margin-right: 20px;
 }

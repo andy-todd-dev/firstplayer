@@ -31,6 +31,7 @@ const App = () => {
         setWinner(
           currentTouchIds[Math.floor(Math.random() * currentTouchIds.length)]
         );
+        setTimerData();
       }, WINNER_SELECTION_DELAY_MILLISECONDS);
       setTimerData({
         timeoutId,
@@ -74,10 +75,20 @@ const App = () => {
       <Stage width={window.innerWidth} height={window.innerHeight}>
         <Layer>{circles}</Layer>
       </Stage>
-    <footer>
-
-      <p>Ver: { import.meta.env.VITE_BUILD_VERSION }</p>
-    </footer>
+      <footer>
+        <ul>
+          <li>Ver: {import.meta.env.VITE_BUILD_VERSION}</li>
+          <li>Touches: {touches.length}</li>
+          <li>
+            Countdown:{" "}
+            {timerData
+              ? WINNER_SELECTION_DELAY_MILLISECONDS -
+                (Date.now() - timerData.timestamp)
+              : "n/a"}
+          </li>
+          <li>Winner: {winner ? "Yes" : "No"}</li>
+        </ul>
+      </footer>
     </div>
   );
 };
