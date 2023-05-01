@@ -28,7 +28,7 @@ jobs:
         working-directory: ./firstplayer
         run: npm run build
         env:
-          VITE_VERSION_BUILD: ${{ github.event.release.tag_name }}
+          VITE_BUILD_VERSION: ${{ github.event.release.tag_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Share artifact inside workflow
       - name: Share artifact inside workflow
