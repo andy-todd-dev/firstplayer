@@ -15,22 +15,20 @@ const getCircleColor = (touch) =>
 
 const App = () => {
   const [timerData, setTimerData] = useState();
-  const [winner, setWinner] = useState();
+  const [winner, setWinner] = useState(null);
+  const [touchesLastChanged, setTouchesLastChanged] = useState(0);
   const [touches, setTouches] = useState([]);
   const currentTouchIds = touches.map((touch) => touch.identifier).sort();
   const currentTouchIdsString = currentTouchIds.join(",");
 
-  useEffect(() => {
-    console.log("Current touches: ", currentTouchIds);
-
+  const onTouchesChanged = () => {
+    setTouchesLastChanged(touchesLastChanged + 1);
     timerData && clearTimeout(timerData.timeoutId) && setTimerData();
-    winner && !currentTouchIds.includes(winner) && setWinner();
+    winner != null && !currentTouchIds.includes(winner) && setWinner(null);
 
-    if (currentTouchIds.length > 1) {
+    if (currentTouchIds.length > 1 && !winner) {
       const timeoutId = setTimeout(() => {
-        setWinner(
-          currentTouchIds[Math.floor(Math.random() * currentTouchIds.length)]
-        );
+        setWinner(currentTouchIds.sort(() => Math.random() - 0.5)[0]);
         setTimerData();
       }, WINNER_SELECTION_DELAY_MILLISECONDS);
       setTimerData({
@@ -38,10 +36,13 @@ const App = () => {
         timestamp: Date.now(),
       });
     }
-  }, [currentTouchIdsString]);
+  };
+
+  useEffect(onTouchesChanged, [currentTouchIdsString]);
 
   const circles = touches.map((touch) => {
-    const useColor = (winner && touch.identifier === winner) || !winner;
+    const useColor =
+      (winner != null && touch.identifier === winner) || winner == null;
     return (
       <Circle
         key={touch.identifier}
@@ -86,7 +87,8 @@ const App = () => {
                 (Date.now() - timerData.timestamp)
               : "n/a"}
           </li>
-          <li>Winner: {winner ? "Yes" : "No"}</li>
+          <li>Winner: {winner}</li>
+          <li>Touches count: {touchesLastChanged}</li>
         </ul>
       </footer>
     </div>
