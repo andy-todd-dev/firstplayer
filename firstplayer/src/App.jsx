@@ -1,40 +1,45 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CgDebug } from "react-icons/cg";
 import { Stage, Layer, Circle } from "react-konva";
 
-import randomColor from "randomcolor";
-
-const WINNER_SELECTION_DELAY_MILLISECONDS = 1000;
+const WINNER_SELECTION_DELAY_MILLISECONDS = 2000;
 const LOSER_COLOR = "darkslategrey";
+const CANDIDATE_COLORS = [
+  "red",
+  "green",
+  "blue",
+  "yellow",
+  "orange",
+  "purple",
+  "pink",
+];
 
 const getCircleColor = (touch) =>
-  randomColor({
-    luminosity: "light",
-    seed: Math.pow(touch.identifier, 5).toString(),
-    format: "hex",
-  });
+  CANDIDATE_COLORS[
+    Math.abs(parseInt(touch.identifier) % CANDIDATE_COLORS.length)
+  ];
 
 const App = () => {
-  const [timerData, setTimerData] = useState();
   const [winner, setWinner] = useState(null);
   const [touches, setTouches] = useState([]);
   const [showDebug, setShowDebug] = useState(false);
+  const [lastTimerReset, setLastTimerReset] = useState(Date.now());
+  const lastTimerResetRef = useRef(lastTimerReset);
+  lastTimerResetRef.current = lastTimerReset;
   const currentTouchIds = touches.map((touch) => touch.identifier).sort();
   const currentTouchIdsString = currentTouchIds.join(",");
 
   const onTouchesChanged = () => {
-    timerData && clearTimeout(timerData.timeoutId) && setTimerData();
     winner != null && !currentTouchIds.includes(winner) && setWinner(null);
 
-    if (currentTouchIds.length > 1 && !winner) {
-      const timeoutId = setTimeout(() => {
-        setWinner(currentTouchIds.sort(() => Math.random() - 0.5)[0]);
-        setTimerData();
+    if (currentTouchIds.length > 1 && winner == null) {
+      const timestamp = Date.now();
+      setTimeout(() => {
+        if (lastTimerResetRef.current == timestamp) {
+          setWinner(currentTouchIds.sort(() => Math.random() - 0.5)[0]);
+        }
       }, WINNER_SELECTION_DELAY_MILLISECONDS);
-      setTimerData({
-        timeoutId,
-        timestamp: Date.now(),
-      });
+      setLastTimerReset(timestamp);
     }
   };
 
@@ -83,20 +88,15 @@ const App = () => {
               }}
             />
           </li>
-          {showDebug && (
-            <>
-              <li>Ver: {import.meta.env.VITE_BUILD_VERSION}</li>
-              <li>Touches: {touches.length}</li>
-              <li>
-                Countdown:{" "}
-                {timerData
-                  ? WINNER_SELECTION_DELAY_MILLISECONDS -
-                    (Date.now() - timerData.timestamp)
-                  : "n/a"}
-              </li>
-              <li>Winner: {winner}</li>
-            </>
-          )}
+          <li style={{ visibility: showDebug ? "visible" : "hidden" }}>
+            Ver: {import.meta.env.VITE_BUILD_VERSION}
+          </li>
+          <li style={{ visibility: showDebug ? "visible" : "hidden" }}>
+            Touches: {touches.length}
+          </li>
+          <li style={{ visibility: showDebug ? "visible" : "hidden" }}>
+            Winner: {winner}
+          </li>
         </ul>
       </footer>
     </div>
