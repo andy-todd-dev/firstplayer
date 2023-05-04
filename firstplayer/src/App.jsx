@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CgDebug } from "react-icons/cg";
 import { Stage, Layer, Circle } from "react-konva";
 
 import randomColor from "randomcolor";
@@ -16,13 +17,12 @@ const getCircleColor = (touch) =>
 const App = () => {
   const [timerData, setTimerData] = useState();
   const [winner, setWinner] = useState(null);
-  const [touchesLastChanged, setTouchesLastChanged] = useState(0);
   const [touches, setTouches] = useState([]);
+  const [showDebug, setShowDebug] = useState(false);
   const currentTouchIds = touches.map((touch) => touch.identifier).sort();
   const currentTouchIdsString = currentTouchIds.join(",");
 
   const onTouchesChanged = () => {
-    setTouchesLastChanged(touchesLastChanged + 1);
     timerData && clearTimeout(timerData.timeoutId) && setTimerData();
     winner != null && !currentTouchIds.includes(winner) && setWinner(null);
 
@@ -55,8 +55,6 @@ const App = () => {
   });
 
   const touchHandler = (e) => {
-    e.preventDefault();
-
     // Convert unhelpfull custom touchList type to standard array
     var touchList = [];
     for (var i = 0; i < e.touches.length; i++) {
@@ -78,17 +76,27 @@ const App = () => {
       </Stage>
       <footer>
         <ul>
-          <li>Ver: {import.meta.env.VITE_BUILD_VERSION}</li>
-          <li>Touches: {touches.length}</li>
           <li>
-            Countdown:{" "}
-            {timerData
-              ? WINNER_SELECTION_DELAY_MILLISECONDS -
-                (Date.now() - timerData.timestamp)
-              : "n/a"}
+            <CgDebug
+              onClick={() => {
+                setShowDebug(!showDebug);
+              }}
+            />
           </li>
-          <li>Winner: {winner}</li>
-          <li>Touches count: {touchesLastChanged}</li>
+          {showDebug && (
+            <>
+              <li>Ver: {import.meta.env.VITE_BUILD_VERSION}</li>
+              <li>Touches: {touches.length}</li>
+              <li>
+                Countdown:{" "}
+                {timerData
+                  ? WINNER_SELECTION_DELAY_MILLISECONDS -
+                    (Date.now() - timerData.timestamp)
+                  : "n/a"}
+              </li>
+              <li>Winner: {winner}</li>
+            </>
+          )}
         </ul>
       </footer>
     </div>
