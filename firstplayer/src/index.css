@@ -41,6 +41,11 @@ footer ul {
 footer li {
   color: gray;
   font-size: small;
+  vertical-align: middle;
   list-style: none;
   margin-right: 20px;
+}
+
+footer .react-icon {
+  margin: auto;
 }
