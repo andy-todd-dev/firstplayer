@@ -28,7 +28,7 @@ const convertTouchListToArray = (touchList) => {
   // like map, filter, etc. This function converts the TouchList to a standard array.
   var touchArray = [];
   for (var i = 0; i < touchList.length; i++) {
-    touchList.push(touchList[i]);
+    touchArray.push(touchList[i]);
   }
   return touchArray;
 };

@@ -5,17 +5,17 @@
       {
         "name": "Dev",
         "color": "#af565c",
-        "command": "cd firstplayer && npm run dev"
+        "command": "npm --prefix ./firstplayer run dev"
       },
       {
         "name": "Build",
         "color": "#af565c",
-        "command": "cd firstplayer && npm run build"
+        "command": "npm --prefix ./firstplayer run build"
       },
       {
         "name": "Test",
         "color": "#af565c",
-        "command": "cd firstplayer && npm run test"
+        "command": "npm --prefix ./firstplayer run test"
       }
     ]
   }
