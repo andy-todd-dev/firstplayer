@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { CgDebug } from "react-icons/cg";
 import { Stage, Layer, Circle } from "react-konva";
 
+const loadedAt = Date.now();
+
 const MINIMUM_TOUCHES_TO_START_WINNER_SELECTION = 2;
 const WINNER_SELECTION_DELAY_MILLISECONDS = 2000;
 const LOSER_COLOR = "darkslategrey";
@@ -21,7 +23,7 @@ const getCircleColorForTouch = (touch) =>
   ];
 
 const selectRandomWinner = (candidates) =>
-  candidates.sort(() => Math.random() - 0.5)[0];
+  candidates[Math.floor(Math.random() * candidates.length)];
 
 const convertTouchListToArray = (touchList) => {
   // The TouchList interface used by the touch events is not a standard array and is missing some helpful methods
@@ -36,8 +38,11 @@ const convertTouchListToArray = (touchList) => {
 const App = () => {
   const [winner, setWinner] = useState(null);
   const [touches, setTouches] = useState([]);
+  const currentTouchIds = touches.map((touch) => touch.identifier).sort();
   const [showDebug, setShowDebug] = useState(false);
   const [touchesLastUpdatedAt, setTouchesLastUpdatedAt] = useState(Date.now());
+  const [winnerLastSelectedAt, setWinnerLastSelectedAt] = useState(null);
+  const [winnerLastNotSelectedAt, setWinnerLastNotSelectedAt] = useState(null);
   const touchesLastUpdatedAtRef = useRef(touchesLastUpdatedAt);
   touchesLastUpdatedAtRef.current = touchesLastUpdatedAt;
 
@@ -61,27 +66,33 @@ const App = () => {
         touchesLastUpdatedAtRef.current === timestamp;
       if (winnerSelectionTimerHasNotBeenReset) {
         setWinner(selectRandomWinner(currentTouchIds));
+        setWinnerLastSelectedAt(Date.now());
+      } else {
+        setWinnerLastNotSelectedAt(Date.now());
       }
     }, WINNER_SELECTION_DELAY_MILLISECONDS);
   };
 
   const onTouchEvent = (e) => {
     const touchList = convertTouchListToArray(e.touches);
-    const currentTouchIds = touchList.map((touch) => touch.identifier).sort();
+    const newTouchIds = touchList.map((touch) => touch.identifier).sort();
 
-    const winnerIsNoLongerTouching =
-      winner != null && !currentTouchIds.includes(winner);
-    if (winnerIsNoLongerTouching) {
-      setWinner(null);
-    }
+    if (currentTouchIds.join(",") !== newTouchIds.join(",")) {
+      const winnerIsNoLongerTouching =
+        winner != null && !newTouchIds.includes(winner);
+      if (winnerIsNoLongerTouching) {
+        setWinner(null);
+      }
 
-    const timestamp = Date.now();
-    setTouchesLastUpdatedAt(timestamp);
-    if (
-      currentTouchIds.length >= MINIMUM_TOUCHES_TO_START_WINNER_SELECTION &&
-      winner === null
-    ) {
-      startWinnerSelectionTimer(currentTouchIds, timestamp);
+      const timestamp = Date.now();
+      setTouchesLastUpdatedAt(timestamp);
+
+      if (
+        newTouchIds.length >= MINIMUM_TOUCHES_TO_START_WINNER_SELECTION &&
+        winner === null
+      ) {
+        startWinnerSelectionTimer(newTouchIds, timestamp);
+      }
     }
 
     setTouches(touchList);
@@ -109,6 +120,24 @@ const App = () => {
           </li>
           {[
             { name: "Ver", value: import.meta.env.VITE_BUILD_VERSION },
+            {
+              name: "T",
+              value: touchesLastUpdatedAt
+                ? touchesLastUpdatedAt - loadedAt
+                : null,
+            },
+            {
+              name: "WLSA",
+              value: winnerLastSelectedAt
+                ? winnerLastSelectedAt - loadedAt
+                : null,
+            },
+            {
+              name: "WLNSA",
+              value: winnerLastNotSelectedAt
+                ? winnerLastNotSelectedAt - loadedAt
+                : null,
+            },
             { name: "Touches", value: touches.length },
             { name: "Winner", value: winner },
           ].map((debugItem, index) => (
