@@ -56,7 +56,7 @@ jobs:
       - uses: badsyntax/github-action-aws-s3@v0.0.1
         name: Sync App files to S3
         with:
-          bucket: fp-bucket
+          bucket: webapp-firstplayer-ui
           awsRegion: us-east-1
           action: sync
           srcDir: ./dist
