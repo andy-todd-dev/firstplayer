@@ -3,5 +3,5 @@ Resources:
     Type: AndyToddDev::Stack::WebApp::MODULE
     Properties: 
       AppDomain: firstplayer.andytodd.dev
-      S3BucketName: fp-bucket
+      AppName: firstplayer
       StagingCName: andy-todd-dev.github.io
